@@ -1,0 +1,7 @@
+<div class="w3-padding-small w3-clear">
+  <div class="w3-pale-red w3-container w3-half w3-round-large {{host?'w3-right':'' }}">
+    <h6 *ngIf="!host"><b>{{message.title}}</b></h6>
+    <p>{{message.context}}</p>
+    <span class="w3-right w3-padding-small">{{message.date | date: 'medium'}}</span>
+  </div>
+</div>

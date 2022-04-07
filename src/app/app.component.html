@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Iessenger</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body>
+<app-app-bar [username]="host"></app-app-bar>
+<app-message-list [messages]="messageModels" [host]="host"></app-message-list>
+<app-send-box (send)="sendMessage($event)"></app-send-box>
+<app-register *ngIf="nameRequired" (getName)="onNameProvided($event)"></app-register>
+</body>
+</html>
+
+
