@@ -16,16 +16,6 @@ export class AppComponent {
   nameRequired = true;
 
   constructor(private webSocketService: WebSocketService) {
-    // Open connection with server socket
-    const stompClient = this.webSocketService.connect();
-    stompClient.connect({}, () => {
-      // Subscribe to notification topic
-      stompClient.subscribe('/topic/notification', notifications => {
-        // Update notifications attribute with the recent messsage sent from the server
-        this.messageModels.push(JSON.parse(notifications.body));
-        window.scrollTo(0, document.body.scrollHeight + 300);
-      });
-    });
   }
 
   sendMessage(context: string): void {
@@ -34,12 +24,16 @@ export class AppComponent {
       date: new Date(),
       title: this.host,
     };
-    this.webSocketService.sendMessage(message).subscribe();
+    this.webSocketService.send(message);
   }
 
   onNameProvided(name: string): void {
     this.host = name;
     this.nameRequired = false;
+    this.webSocketService.listen(message => {
+      this.messageModels.push(message);
+    });
   }
+
 
 }

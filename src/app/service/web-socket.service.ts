@@ -1,26 +1,40 @@
-import {Injectable} from '@angular/core';
+import {Injectable, OnDestroy} from '@angular/core';
 import {CompatClient, Stomp} from '@stomp/stompjs';
-import * as SockJS from 'sockjs-client';
 import {MessageModel} from '../model/message.model';
-import {Observable} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
+import {StompSubscription} from '@stomp/stompjs/src/stomp-subscription';
+
+export type listenerCallBack = (message: MessageModel) => void;
 
 @Injectable({
   providedIn: 'root'
 })
-export class WebSocketService {
+export class WebSocketService implements OnDestroy {
 
+  private connection: CompatClient = undefined;
 
-  constructor(private http: HttpClient) {
+  private subscription: StompSubscription;
+
+  constructor() {
+    this.connection = Stomp.client('ws://localhost:8080/protocol');
+    this.connection.connect({}, () => console.log('something have done'));
   }
 
-  public connect(): CompatClient {
-    const socket: SockJS = new SockJS(`http://localhost:8080/socket`);
-    return Stomp.over(socket);
+  public send(message: MessageModel): void {
+    if (this.connection.connected) {
+      this.connection.send('/ws/message', {}, JSON.stringify(message));
+    }
   }
 
-  public sendMessage(message: MessageModel): Observable<void> {
-    return this.http.post<void>('http://localhost:8080/notify', message);
+  public listen(fun: listenerCallBack): void {
+    if (this.connection.connected) {
+      this.subscription = this.connection.subscribe('/messenger/notification', message => fun(JSON.parse(message.body)));
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
 }
